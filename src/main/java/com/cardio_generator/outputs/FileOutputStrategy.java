@@ -7,13 +7,13 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class fileOutputStrategy implements OutputStrategy {
+public class FileOutputStrategy implements OutputStrategy { // Class names should written in UpperCamelCase (and should be equal to the file name), so change "fileOutputStrategy" to "FileOutputStrategy"
 
     private String BaseDirectory;
 
     public final ConcurrentHashMap<String, String> file_map = new ConcurrentHashMap<>();
 
-    public fileOutputStrategy(String baseDirectory) {
+    public FileOutputStrategy(String baseDirectory) { // Constructor should have the same name as the class, so change "fileOutputStrategy" to "FileOutputStrategy"
 
         this.BaseDirectory = baseDirectory;
     }
