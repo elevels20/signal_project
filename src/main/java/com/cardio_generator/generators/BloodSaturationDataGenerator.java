@@ -16,7 +16,7 @@ public class BloodSaturationDataGenerator implements PatientDataGenerator {
 
     /**
      * Creates a BloodSaturationDataGenerator as an integer array for a speficied number of patients.
-     * The method uses a ranom number generator for simulating the data.
+     * The method uses a random number generator for simulating the data.
      * This is a constructor method.
      * 
      * @param patientCount The integer that specifies the number of patients for whom the data needs to be generated
