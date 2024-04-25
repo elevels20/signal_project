@@ -139,7 +139,7 @@ public class HealthDataSimulator {
     /**
      * Initializes patient Ids starting from 1 up to the specified patient count.
      * 
-     * @param patientCount integer that specifies the number of patients
+     * @param patientCount The integer that specifies the number of patients
      * @return An integer list of patient Ids
      */
     private static List<Integer> initializePatientIds(int patientCount) {
