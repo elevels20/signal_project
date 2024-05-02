@@ -66,9 +66,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## uml_models
 Here you can find several UML models, including UML class diagrams, a state diagram and a sequence diagram.
-[Link to uml_models Directory](uml_models)
+[Link to uml_models directory](uml_models)
 
 
-## Project Member
+## Project Members
 - Student ID: i6368803
 - Student ID: i6344286
