@@ -3,8 +3,12 @@ package com.alerts;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.data_management.DataStorage;
 import com.data_management.Patient;
+import com.data_management.PatientRecord;
 import com.data_management.PatientRecord;
 
 /**
@@ -15,6 +19,7 @@ import com.data_management.PatientRecord;
  */
 public class AlertGenerator {
     private DataStorage dataStorage;
+    private List<AlertHandler> alertHandlers;
 
     /**
      * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
@@ -26,6 +31,10 @@ public class AlertGenerator {
      */
     public AlertGenerator(DataStorage dataStorage) {
         this.dataStorage = dataStorage;
+        this.alertHandlers = new ArrayList<>();
+        // Add default alert handlers
+        this.alertHandlers.add(new FileAlertHandler("alerts.log"));
+        this.alertHandlers.add(new PagerAlertHandler(new Pager()));
     }
 
     /**
@@ -196,6 +205,8 @@ public class AlertGenerator {
      * @param alert the alert object containing details about the alert condition
      */
     private void triggerAlert(Alert alert) {
-        // Implementation might involve logging the alert or notifying staff
+        for (AlertHandler handler : alertHandlers) {
+            handler.handleAlert(alert);
+        }
     }
 }
