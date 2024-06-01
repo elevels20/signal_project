@@ -4,15 +4,31 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.java_websocket.client.WebSocketClient;
 
 public class DataReaderImplementation implements DataReader{
 
     private DataStorage dataStorage;
     private String outDirectory;
+    private WebSocketClient webSocketClient;
 
     public DataReaderImplementation (DataStorage dataStorage, String directory){
         this.dataStorage = dataStorage;
         this.outDirectory = directory;
+    }
+
+    @Override
+    public void connectToWebSocket(DataStorage dataStorage, String uri) throws IOException {
+        this.dataStorage = dataStorage;
+        try {
+            webSocketClient = new WebSocketClientImplementation(dataStorage, new URI(uri)); 
+            webSocketClient.connect();
+        } catch (URISyntaxException e) {
+            throw new IOException("Invalid WebSocket URI: " + uri, e);
+        }
     }
 
     @Override
