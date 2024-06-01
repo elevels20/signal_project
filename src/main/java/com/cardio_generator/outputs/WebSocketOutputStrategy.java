@@ -3,6 +3,10 @@ package com.cardio_generator.outputs;
 import org.java_websocket.WebSocket;
 import org.java_websocket.server.WebSocketServer;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
 import java.net.InetSocketAddress;
 
 public class WebSocketOutputStrategy implements OutputStrategy {
@@ -15,14 +19,33 @@ public class WebSocketOutputStrategy implements OutputStrategy {
         server.start();
     }
 
+    // @Override
+    // public void output(int patientId, long timestamp, String label, String data) {
+    //     String message = String.format("%d,%d,%s,%s", patientId, timestamp, label, data);
+    //     // Broadcast the message to all connected clients
+    //     for (WebSocket conn : server.getConnections()) {
+    //         conn.send(message);
+    //     }
+    // }
     @Override
     public void output(int patientId, long timestamp, String label, String data) {
-        String message = String.format("%d,%d,%s,%s", patientId, timestamp, label, data);
-        // Broadcast the message to all connected clients
-        for (WebSocket conn : server.getConnections()) {
-            conn.send(message);
+        try {
+            // Construct JSON message with patient information
+            JSONObject jsonMessage = new JSONObject();
+            jsonMessage.put("patientId", patientId);
+            jsonMessage.put("timestamp", timestamp);
+            jsonMessage.put("label", label);
+            jsonMessage.put("data", data);
+
+            // Broadcast the JSON message to all connected clients
+            for (WebSocket conn : server.getConnections()) {
+                conn.send(jsonMessage.toString());
+            }
+        } catch (JSONException e) {
+            System.err.println("Error formatting JSON message: " + e.getMessage());
         }
     }
+
 
     private static class SimpleWebSocketServer extends WebSocketServer {
 
