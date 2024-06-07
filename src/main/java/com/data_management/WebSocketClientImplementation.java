@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 public class WebSocketClientImplementation extends WebSocketClient {
 
     private DataStorage dataStorage;
+    private boolean isConnected = false;
 
     public WebSocketClientImplementation(DataStorage dataStorage, URI serverUri) {
         super(serverUri);
@@ -17,7 +18,12 @@ public class WebSocketClientImplementation extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshake) {
+        isConnected = true;
         System.out.println("Connected to WebSocket server at " + getURI());
+    }
+
+    public boolean isConnected() {
+        return isConnected;
     }
 
     @Override
@@ -45,6 +51,7 @@ public class WebSocketClientImplementation extends WebSocketClient {
     public void onClose(int code, String reason, boolean remote) {
         System.out.println("Disconnected from WebSocket server: " + reason);
         // Raise an error for interruption in the data stream
+        isConnected = false;
         onError(new Exception("Data stream interrupted"));
     }
 

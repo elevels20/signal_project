@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.alerts.AlertGenerator;
 
 /**
@@ -20,7 +22,7 @@ public class DataStorage {
      * structure.
      */
     public DataStorage() {
-        this.patientMap = new HashMap<>();
+        this.patientMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -36,13 +38,24 @@ public class DataStorage {
      * @param timestamp        the time at which the measurement was taken, in
      *                         milliseconds since the Unix epoch
      */
-        public void addPatientData(int patientId, double measurementValue, String recordType, long timestamp) {
-        Patient patient = patientMap.get(patientId);
-        if (patient == null) {
-            patient = new Patient(patientId);
-            patientMap.put(patientId, patient);
+    //     public void addPatientData(int patientId, double measurementValue, String recordType, long timestamp) {
+    //     Patient patient = patientMap.get(patientId);
+    //     if (patient == null) {
+    //         patient = new Patient(patientId);
+    //         patientMap.put(patientId, patient);
+    //     }
+    //     patient.addRecord(measurementValue, recordType, timestamp);
+    // }
+
+    public void addPatientData(int patientId, double measurementValue, String recordType, long timestamp) {
+        synchronized (this) {
+            Patient patient = patientMap.get(patientId);
+            if (patient == null) {
+                patient = new Patient(patientId);
+                patientMap.put(patientId, patient);
+            }
+            patient.addRecord(measurementValue, recordType, timestamp);
         }
-        patient.addRecord(measurementValue, recordType, timestamp);
     }
 
     /**
@@ -109,3 +122,4 @@ public class DataStorage {
         }
     }
 }
+
