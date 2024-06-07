@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import com.data_management.DataStorage;
 import com.alerts.AlertGenerator;
+import com.alerts.Pager;
+import com.alerts.PagerAlertHandler;
 import com.data_management.Patient;
 import java.util.List;
 
@@ -13,6 +15,10 @@ public class AlertGeneratorTest {
     void testBloodPressureAlerts() {
         DataStorage dataStorage = new DataStorage();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
+        Pager pager = new Pager();
+        // Replace default handlers with the PagerAlertHandler
+        alertGenerator.getAlertHandlers().clear();
+        alertGenerator.getAlertHandlers().add(new PagerAlertHandler(pager));
         // Test for Increasing Trend
         // Verify an alert is triggered when three consecutive blood pressure readings 
         // increase by more than 10 mmHg each.
@@ -49,12 +55,22 @@ public class AlertGeneratorTest {
         for (Patient patient : patients) {
             alertGenerator.evaluateData(patient);
         }
+        // Verify the alerts
+        List<String> notifications = pager.getNotifications();
+        assertTrue(notifications.stream().anyMatch(msg -> msg.contains("Systolic Trend Alert")));
+        assertTrue(notifications.stream().anyMatch(msg -> msg.contains("Critical Systolic Blood Pressure")));
+        assertTrue(notifications.stream().anyMatch(msg -> msg.contains("Critical Diastolic Blood Pressure")));
     }
 
     @Test
     void testBloodSaturationAlerts() {
         DataStorage dataStorage = new DataStorage();
+        Pager pager = new Pager();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
+        // Replace default handlers with the PagerAlertHandler
+        alertGenerator.getAlertHandlers().clear();
+        alertGenerator.getAlertHandlers().add(new PagerAlertHandler(pager));
+
         // Test for Low Saturation
         dataStorage.addPatientData(0, 91, "Blood Saturation", 0);
     
@@ -69,24 +85,43 @@ public class AlertGeneratorTest {
             alertGenerator.evaluateData(patient);
         }
 
+        // Verify the alerts
+        List<String> notifications = pager.getNotifications();
+        assertTrue(notifications.stream().anyMatch(msg -> msg.contains("Low blood oxygen saturation")));
+        assertTrue(notifications.stream().anyMatch(msg -> msg.contains("Rapid Drop in Blood Saturation")));
     }
 
     @Test
     void testCombinedAlert() {
         DataStorage dataStorage = new DataStorage();
+        Pager pager = new Pager();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
+
+        // Replace default handlers with the PagerAlertHandler
+        alertGenerator.getAlertHandlers().clear();
+        alertGenerator.getAlertHandlers().add(new PagerAlertHandler(pager));
+ 
 
         // Test for Hypotensive Hypoxemia Alert
         dataStorage.addPatientData(0, 89, "Systolic Blood Pressure", 0);
         dataStorage.addPatientData(0, 91, "Blood Saturation", 0);
 
         alertGenerator.evaluateData(dataStorage.getAllPatients().get(0));
+
+         // Verify the alerts
+         List<String> notifications = pager.getNotifications();
+         assertTrue(notifications.stream().anyMatch(msg -> msg.contains("Hypotensive Hypoxemia")));
     }
 
     @Test
     void testECGAlerts() {
         DataStorage dataStorage = new DataStorage();
+        Pager pager = new Pager();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
+
+        // Replace default handlers with the PagerAlertHandler
+        alertGenerator.getAlertHandlers().clear();
+        alertGenerator.getAlertHandlers().add(new PagerAlertHandler(pager));
 
         // Test for Abnormal Heart Rate
         dataStorage.addPatientData(0, 49, "ECG", 0);
@@ -101,5 +136,9 @@ public class AlertGeneratorTest {
         for (Patient patient : patients) {
             alertGenerator.evaluateData(patient);
         }
+
+        // Verify the alerts
+        List<String> notifications = pager.getNotifications();
+        assertTrue(notifications.stream().anyMatch(msg -> msg.contains("Abnormal Heart Rate")));
     }
 }

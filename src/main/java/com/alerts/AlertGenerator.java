@@ -37,6 +37,10 @@ public class AlertGenerator {
         this.alertHandlers.add(new PagerAlertHandler(new Pager()));
     }
 
+    public List<AlertHandler> getAlertHandlers() {
+        return alertHandlers;
+    }
+
     /**
      * Evaluates the specified patient's data to determine if any alert conditions
      * are met. If a condition is met, an alert is triggered via the
