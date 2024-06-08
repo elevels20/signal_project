@@ -1,6 +1,7 @@
 package data_management;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -9,6 +10,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import com.data_management.DataStorage;
 import com.cardio_generator.outputs.WebSocketOutputStrategy;
@@ -24,6 +27,7 @@ public class DataReaderImplementationTest {
     private DataStorage dataStorage;
     private DataReader dataReader;
     private int port;
+    private WebSocketOutputStrategy outputStrategy;
 
     @BeforeEach
     public void setUp() {
@@ -32,59 +36,80 @@ public class DataReaderImplementationTest {
 
         // Start the WebSocket server
         port = 8080;
-        WebSocketOutputStrategy outputStrategy = new WebSocketOutputStrategy(port);
+        outputStrategy = new WebSocketOutputStrategy(port);
+    }
 
+    @AfterEach
+    void tearDown() {
+        if (outputStrategy != null) {
+            outputStrategy.stopServer();
+        }
     }
 
     // @Test
     // public void testConnectToWebSocket_SuccessfulConnection() throws IOException {
-    //     try {
-    //         // Create a WebSocketClientImplementation
-    //         WebSocketClientImplementation webSocketClient = new WebSocketClientImplementation(dataStorage, new URI("ws://example.com"));
+    //         // Create the URI for the WebSocket server
+    //         URI serverUri;
+    //         try {
+    //             serverUri = new URI("ws://localhost:" + port);
+    //         } catch (URISyntaxException e) {
+    //             e.printStackTrace();
+    //             return;
+    //         }
 
     //         // Call the method being tested
-    //         dataReader.connectToWebSocket(dataStorage, "ws://example.com");
+    //         dataReader.connectToWebSocket(dataStorage, serverUri.toString());
+    //         WebSocketClientImplementation webSocketClient = dataReader.getWebSocket();
 
+    //         // Add a delay to ensure connection setup before sending messages and checking connection
+    //         try {
+    //             Thread.sleep(1000); // Adjust the delay as needed
+    //         } catch (InterruptedException e) {
+    //             e.printStackTrace();
+    //         }
     //         // Verify that the WebSocketClient's connect method was called
     //         assertTrue(webSocketClient.isConnected());
-    //     } catch (URISyntaxException e) {
-    //         // If a URISyntaxException occurs, it indicates test failure
-    //         fail("Unexpected URISyntaxException: " + e.getMessage());
-    //     }
+
+    //         if (webSocketClient != null && webSocketClient.isOpen()) {
+    //             webSocketClient.close();
+    //         }
     // }
     @Test
-    public void testConnectToWebSocket_SuccessfulConnection() throws IOException {
-        //try {
-            // Create the URI for the WebSocket server
-            URI serverUri;
-            try {
-                serverUri = new URI("ws://localhost:" + port);
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-                return;
+    public void testConnectToWebSocket_SuccessfulConnection() throws IOException, URISyntaxException, InterruptedException {
+        // Create the URI for the WebSocket server
+        URI serverUri;
+        try {
+            serverUri = new URI("ws://localhost:" + port);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Call the method being tested
+        dataReader.connectToWebSocket(dataStorage, serverUri.toString());
+        WebSocketClientImplementation webSocketClient = dataReader.getWebSocket();
+
+        // Use CountDownLatch for synchronization
+        CountDownLatch latch = new CountDownLatch(1);
+        new Thread(() -> {
+            while (!webSocketClient.isOpen()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
+            latch.countDown();
+        }).start();
 
-            // // Create and connect the WebSocket client
-            // WebSocketClientImplementation webSocketClient = new WebSocketClientImplementation(dataStorage, serverUri);
-            // webSocketClient.connect();
+        // Wait up to 5 seconds for the connection to be established
+        boolean connected = latch.await(5, TimeUnit.SECONDS);
+        assertTrue(connected, "WebSocketClient should be connected within the timeout period.");
+        assertTrue(webSocketClient.isConnected());
 
-
-            // Call the method being tested
-            dataReader.connectToWebSocket(dataStorage, serverUri.toString());
-
-                    // Add a delay to ensure connection setup before sending messages and checking connection
-            try {
-                Thread.sleep(1000); // Adjust the delay as needed
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            // Verify that the WebSocketClient's connect method was called
-            // assertTrue(webSocketClient.isConnected());
-            assertTrue(dataReader.getWebSocket().isConnected());
-        // } catch (URISyntaxException e) {
-        //     // If a URISyntaxException occurs, it indicates test failure
-        //     fail("Unexpected URISyntaxException: " + e.getMessage());
-        // }
+        if (webSocketClient != null && webSocketClient.isOpen()) {
+            webSocketClient.close();
+        }
     }
 
     @Test

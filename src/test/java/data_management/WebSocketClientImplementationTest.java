@@ -1,31 +1,77 @@
 package data_management;
 
 import org.java_websocket.handshake.ServerHandshake;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.data_management.WebSocketClientImplementation;
+import com.cardio_generator.outputs.WebSocketOutputStrategy;
 import com.data_management.DataStorage;
 
 class WebSocketClientImplementationTest {
 
     private DataStorage dataStorage;
     private WebSocketClientImplementation webSocketClient;
+    private int port;
+    private WebSocketOutputStrategy outputStrategy;
 
     @BeforeEach
     void setUp() throws URISyntaxException {
         dataStorage = new DataStorage();
-        webSocketClient = new WebSocketClientImplementation(dataStorage, new URI("ws://localhost:8080/socket"));
+        // Start the WebSocket server
+        port = 8080;
+        outputStrategy = new WebSocketOutputStrategy(port);
+
+        // Create the URI for the WebSocket server
+        URI serverUri;
+        try {
+            serverUri = new URI("ws://localhost:" + port);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Create and connect the WebSocket client
+        webSocketClient = new WebSocketClientImplementation(dataStorage, serverUri);
+        webSocketClient.connect();
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (webSocketClient != null && webSocketClient.isOpen()) {
+            webSocketClient.close();
+        }
+        if (outputStrategy != null) {
+            outputStrategy.stopServer();
+        }
     }
 
     @Test
-    void testOnOpen() {
-        webSocketClient.onOpen(null);
+    void testOnOpen() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+
+        new Thread(() -> {
+            while (!webSocketClient.isOpen()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            latch.countDown();
+        }).start();
+
+        // Wait up to 5 seconds for the connection to be established
+        boolean connected = latch.await(5, TimeUnit.SECONDS);
+        assertTrue(connected, "WebSocketClient should be connected within the timeout period.");
         assertTrue(webSocketClient.isOpen());
     }
 

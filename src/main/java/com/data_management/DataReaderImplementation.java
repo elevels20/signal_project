@@ -18,17 +18,29 @@ public class DataReaderImplementation implements DataReader{
         this.outDirectory = directory;
     }
 
+    // @Override
+    // public void connectToWebSocket(DataStorage dataStorage, String uri) throws IOException {
+    //     this.dataStorage = dataStorage;
+    //     try {
+    //         webSocketClient = new WebSocketClientImplementation(dataStorage, new URI(uri)); 
+    //         webSocketClient.connect();
+    //     } catch (URISyntaxException e) {
+    //         throw new IOException("Invalid WebSocket URI: " + uri, e);
+    //     }
+    // }
     @Override
     public void connectToWebSocket(DataStorage dataStorage, String uri) throws IOException {
-        this.dataStorage = dataStorage;
         try {
-            webSocketClient = new WebSocketClientImplementation(dataStorage, new URI(uri)); 
-            webSocketClient.connect();
-        } catch (URISyntaxException e) {
-            throw new IOException("Invalid WebSocket URI: " + uri, e);
+            URI serverUri = new URI(uri);
+            webSocketClient = new WebSocketClientImplementation(dataStorage, serverUri);
+            webSocketClient.connectBlocking(); // Blocking connect to ensure connection is established or failed before proceeding
+            if (!webSocketClient.isConnected()) {
+                throw new IOException("Failed to connect to WebSocket server: " + uri);
+            }
+        } catch (URISyntaxException | InterruptedException e) {
+            throw new IOException("Invalid URI or connection interrupted: " + uri, e);
         }
     }
-
     @Override
     public WebSocketClientImplementation getWebSocket() {
         return webSocketClient;

@@ -46,6 +46,18 @@ public class WebSocketOutputStrategy implements OutputStrategy {
         }
     }
 
+    public void stopServer() {
+        if (server != null) {
+            try {
+                server.stop();
+                System.out.println("WebSocket server stopped.");
+            } catch (InterruptedException e) {
+                System.err.println("Error stopping WebSocket server: " + e.getMessage());
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
 
     private static class SimpleWebSocketServer extends WebSocketServer {
 
