@@ -3,6 +3,8 @@ package com.data_management;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
+import com.cardio_generator.outputs.WebSocketOutputStrategy;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -64,5 +66,35 @@ public class WebSocketClientImplementation extends WebSocketClient {
         } else {
             System.err.println("WebSocket error: " + ex.getMessage());
         }
+    }
+    public static void main(String[] args) {
+        // Create an instance of DataStorage 
+        DataStorage dataStorage = new DataStorage();
+
+        // Start the WebSocket server
+        int port = 8080;
+        WebSocketOutputStrategy outputStrategy = new WebSocketOutputStrategy(port);
+
+        // Create the URI for the WebSocket server
+        URI serverUri;
+        try {
+            serverUri = new URI("ws://localhost:" + port);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Create and connect the WebSocket client
+        WebSocketClientImplementation client = new WebSocketClientImplementation(dataStorage, serverUri);
+        client.connect();
+
+        // Add a delay to ensure connection setup before sending messages
+        try {
+            Thread.sleep(1000); // Adjust the delay as needed
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Now the client is connected to the server and can receive messages
     }
 }

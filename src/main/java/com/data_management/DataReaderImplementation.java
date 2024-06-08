@@ -7,13 +7,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.java_websocket.client.WebSocketClient;
-
 public class DataReaderImplementation implements DataReader{
 
     private DataStorage dataStorage;
     private String outDirectory;
-    private WebSocketClient webSocketClient;
+    private WebSocketClientImplementation webSocketClient;
 
     public DataReaderImplementation (DataStorage dataStorage, String directory){
         this.dataStorage = dataStorage;
@@ -29,6 +27,11 @@ public class DataReaderImplementation implements DataReader{
         } catch (URISyntaxException e) {
             throw new IOException("Invalid WebSocket URI: " + uri, e);
         }
+    }
+
+    @Override
+    public WebSocketClientImplementation getWebSocket() {
+        return webSocketClient;
     }
 
     @Override

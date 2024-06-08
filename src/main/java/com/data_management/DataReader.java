@@ -19,4 +19,11 @@ public interface DataReader {
      * @throws IOException if there is an error connecting to the WebSocket server or reading the data
      */
     void connectToWebSocket(DataStorage dataStorage, String uri) throws IOException;
+
+    /**
+     * Returns connected WebSocketClient
+     * 
+     * @return the connected WebSocketClient
+     */
+    WebSocketClientImplementation getWebSocket();
 }
