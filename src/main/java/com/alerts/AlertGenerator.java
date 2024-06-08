@@ -187,7 +187,8 @@ public class AlertGenerator {
         }
         // Irregular Beat Alert
         // Trigger alert if the difference in heart rate between consecutive records is more than 10 bpm
-        for (int i = 2; i < ECGRecords.size(); i++) {
+        //for (int i = 2; i < ECGRecords.size(); i++) {
+        for (int i = 1; i < ECGRecords.size(); i++) {
             PatientRecord prevRecord = ECGRecords.get(i - 1);
             PatientRecord currentRecord = ECGRecords.get(i);
 

@@ -140,5 +140,6 @@ public class AlertGeneratorTest {
         // Verify the alerts
         List<String> notifications = pager.getNotifications();
         assertTrue(notifications.stream().anyMatch(msg -> msg.contains("Abnormal Heart Rate")));
+        assertTrue(notifications.stream().anyMatch(msg -> msg.contains("Irregular Beat")));
     }
 }
