@@ -25,7 +25,7 @@ class WebSocketClientImplementationTest {
 
     @BeforeEach
     void setUp() throws URISyntaxException {
-        dataStorage = new DataStorage();
+        dataStorage = DataStorage.getInstance();
         // Start the WebSocket server
         port = 8080;
         outputStrategy = new WebSocketOutputStrategy(port);

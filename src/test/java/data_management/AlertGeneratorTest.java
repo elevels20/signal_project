@@ -13,7 +13,7 @@ public class AlertGeneratorTest {
     
     @Test
     void testBloodPressureAlerts() {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
         Pager pager = new Pager();
         // Replace default handlers with the PagerAlertHandler
@@ -64,7 +64,7 @@ public class AlertGeneratorTest {
 
     @Test
     void testBloodSaturationAlerts() {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         Pager pager = new Pager();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
         // Replace default handlers with the PagerAlertHandler
@@ -93,7 +93,7 @@ public class AlertGeneratorTest {
 
     @Test
     void testCombinedAlert() {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         Pager pager = new Pager();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
 
@@ -115,7 +115,7 @@ public class AlertGeneratorTest {
 
     @Test
     void testECGAlerts() {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         Pager pager = new Pager();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
 

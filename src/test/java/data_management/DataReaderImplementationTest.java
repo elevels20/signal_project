@@ -31,7 +31,7 @@ public class DataReaderImplementationTest {
 
     @BeforeEach
     public void setUp() {
-        dataStorage = new DataStorage();
+        dataStorage = DataStorage.getInstance();
         dataReader = new DataReaderImplementation(dataStorage, "test_directory");
 
         // Start the WebSocket server

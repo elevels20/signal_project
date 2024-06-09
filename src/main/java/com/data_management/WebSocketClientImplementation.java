@@ -69,7 +69,7 @@ public class WebSocketClientImplementation extends WebSocketClient {
     }
     public static void main(String[] args) {
         // Create an instance of DataStorage 
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
 
         // Start the WebSocket server
         int port = 8080;
