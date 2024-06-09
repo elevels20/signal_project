@@ -75,7 +75,7 @@ public class AlertGenerator {
                 ECGRecords.add(record);
             }
             else { // Triggered Alert (by nurses or patients)
-                triggerAlert(new Alert(Integer.toString(record.getPatientId()), type, record.getTimestamp()));
+                triggerAlert(new GenericAlertFactory().createAlert(Integer.toString(record.getPatientId()), type, record.getTimestamp()));
             }
         }
 
@@ -87,6 +87,7 @@ public class AlertGenerator {
 
     }
     private void checkBloodPressureAlerts(List<PatientRecord> systolicBloodPressureRecords, List<PatientRecord> diastolicBloodPressureRecords) {
+        BloodPressureAlertFactory factory = new BloodPressureAlertFactory();
         // Trend Alert systolic blood pressure
         if (systolicBloodPressureRecords.size() > 2) { // we need at least 3 consecutive readings for checking for trend alerts
             for (int i = 2; i < systolicBloodPressureRecords.size(); i++) {
@@ -95,7 +96,7 @@ public class AlertGenerator {
                 double nextSystolic = systolicBloodPressureRecords.get(i).getMeasurementValue();
 
                 if (Math.abs(currSystolic - prevSystolic) > 10 && Math.abs(nextSystolic - currSystolic) > 10) {
-                    triggerAlert(new Alert(Integer.toString(systolicBloodPressureRecords.get(i).getPatientId()), "Systolic Trend Alert", systolicBloodPressureRecords.get(i).getTimestamp()));
+                    triggerAlert(factory.createAlert(Integer.toString(systolicBloodPressureRecords.get(i).getPatientId()), "Systolic Trend Alert", systolicBloodPressureRecords.get(i).getTimestamp()));
                 }
             }
         }
@@ -108,7 +109,7 @@ public class AlertGenerator {
                 double nextDiastolic = diastolicBloodPressureRecords.get(i).getMeasurementValue();
 
                 if (Math.abs(currDiastolic - prevDiastolic) > 10 && Math.abs(nextDiastolic - currDiastolic) > 10) {
-                    triggerAlert(new Alert(Integer.toString(systolicBloodPressureRecords.get(i).getPatientId()), "Diastolic Trend Alert", systolicBloodPressureRecords.get(i).getTimestamp()));
+                    triggerAlert(factory.createAlert(Integer.toString(systolicBloodPressureRecords.get(i).getPatientId()), "Diastolic Trend Alert", systolicBloodPressureRecords.get(i).getTimestamp()));
                 }
             }
         }
@@ -117,23 +118,24 @@ public class AlertGenerator {
         for (PatientRecord record : systolicBloodPressureRecords) {
             double value = record.getMeasurementValue();
             if (value > 180 || value < 90) {
-                triggerAlert(new Alert(Integer.toString(record.getPatientId()), "Critical Systolic Blood Pressure", record.getTimestamp()));
+                triggerAlert(factory.createAlert(Integer.toString(record.getPatientId()), "Critical Systolic Blood Pressure", record.getTimestamp()));
             }
         }
         for (PatientRecord record : diastolicBloodPressureRecords) {
             double value = record.getMeasurementValue();
             if (value > 120 || value < 60) {
-                triggerAlert(new Alert(Integer.toString(record.getPatientId()), "Critical Diastolic Blood Pressure", record.getTimestamp()));
+                triggerAlert(factory.createAlert(Integer.toString(record.getPatientId()), "Critical Diastolic Blood Pressure", record.getTimestamp()));
             }
         }
     }
 
     private void checkBloodSaturationAlerts(List<PatientRecord> bloodSaturationRecords) {
+        BloodOxygenAlertFactory factory = new BloodOxygenAlertFactory();
         // Low Saturation Alert
         for (PatientRecord record : bloodSaturationRecords) {
             double value = record.getMeasurementValue();
             if (value < 92) {
-                triggerAlert(new Alert(Integer.toString(record.getPatientId()), "Low blood oxygen saturation", record.getTimestamp()));
+                triggerAlert(factory.createAlert(Integer.toString(record.getPatientId()), "Low blood oxygen saturation", record.getTimestamp()));
             }
         }
 
@@ -152,13 +154,14 @@ public class AlertGenerator {
 
                 if ((endTime - startTime <= (10 * 60 * 1000)) && (startValue - endValue >= 5)) {
                     // Blood oxygen saturation level drops by 5% or more within a 10-minute interval
-                    triggerAlert(new Alert(Integer.toString(endRecord.getPatientId()), "Rapid Drop in Blood Saturation", endRecord.getTimestamp()));
+                    triggerAlert(factory.createAlert(Integer.toString(endRecord.getPatientId()), "Rapid Drop in Blood Saturation", endRecord.getTimestamp()));
                 }
             }
         }
     }
 
     private void checkCombinedAlerts(List<PatientRecord> systolicBloodPressureRecords, List<PatientRecord> bloodSaturationRecords) {
+        CombinedAlertFactory factory = new CombinedAlertFactory();
         // Hypotensive Hypoxemia Alert
         for (PatientRecord systolicRecord : systolicBloodPressureRecords) {
             double systolicBloodPressure = systolicRecord.getMeasurementValue();
@@ -169,7 +172,7 @@ public class AlertGenerator {
                     if (systolicTime == saturationTime) {
                         double saturationValue = saturationRecord.getMeasurementValue();
                         if (saturationValue < 92) {
-                            triggerAlert(new Alert(Integer.toString(systolicRecord.getPatientId()), "Hypotensive Hypoxemia", saturationTime));
+                            triggerAlert(factory.createAlert(Integer.toString(systolicRecord.getPatientId()), "Hypotensive Hypoxemia", saturationTime));
                         }
                     }
                 }
@@ -178,11 +181,12 @@ public class AlertGenerator {
     }
 
     private void checkECGAlerts(List<PatientRecord> ECGRecords) {
+        ECGAlertFactory factory = new ECGAlertFactory();
         // Abnormal Heart Rate Alert
         for (PatientRecord record : ECGRecords) {
             double heartRate = record.getMeasurementValue();
             if (heartRate < 50 || heartRate > 100) {
-                triggerAlert(new Alert(Integer.toString(record.getPatientId()), "Abnormal Heart Rate", 0));
+                triggerAlert(factory.createAlert(Integer.toString(record.getPatientId()), "Abnormal Heart Rate", record.getTimestamp()));
             }
         }
         // Irregular Beat Alert
@@ -196,7 +200,7 @@ public class AlertGenerator {
             double currentHeartRate = currentRecord.getMeasurementValue();
 
             if (Math.abs(currentHeartRate - prevHeartRate) > 10) {
-                triggerAlert(new Alert(Integer.toString(currentRecord.getPatientId()), "Irregular Beat", currentRecord.getTimestamp()));
+                triggerAlert(factory.createAlert(Integer.toString(currentRecord.getPatientId()), "Irregular Beat", currentRecord.getTimestamp()));
             }
         }
     }
