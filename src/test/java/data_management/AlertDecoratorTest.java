@@ -1,7 +1,6 @@
 package data_management;
 
 import static org.junit.jupiter.api.Assertions.*;
-import
 import com.alerts.Alert;
 import com.alerts.PriorityAlertDecorator;
 import com.alerts.RepeatedAlertDecorator;
@@ -11,20 +10,19 @@ public class AlertDecoratorTest {
 
     @Test
     public void testRepeatedAlertDecorator() {
-        Alert alert = new Alert("patient1", "Condition", System.currentTimeMillis());
+        Alert alert = new Alert("patient1", "Condition", 5);
         Alert repeatedAlert = new RepeatedAlertDecorator(alert, 2, 5);
-
         assertNotNull(repeatedAlert);
-        assertTrue(repeatedAlert.getCondition().contains("Condition (Repeated)"));
+        assertTrue(repeatedAlert.getAlertMessage().contains("Condition for patient patient1 at 5\n" +
+                "Repeated 2 times at intervals of 5 ms."));
     }
 
     @Test
     public void testPriorityAlertDecorator() {
-        Alert alert = new Alert("patient1", "Condition", System.currentTimeMillis());
+        Alert alert = new Alert("patient1", "Condition", 5);
         Alert priorityAlert = new PriorityAlertDecorator(alert, "HIGH");
-
         assertNotNull(priorityAlert);
-        assertTrue(priorityAlert.getCondition().contains("Condition (High Priority)"));
+        assertTrue(priorityAlert.getAlertMessage().contains("[Priority: HIGH] Alert: Condition for patient patient1 at 5"));
     }
 
 

@@ -100,7 +100,7 @@
                 <archive>
                     <manifest>
                         <addClasspath>true</addClasspath>
-                        <mainClass>com.Main</mainClass>
+                        <mainClass>com.data_management.Main</mainClass>
                     </manifest>
                 </archive>
             </configuration>

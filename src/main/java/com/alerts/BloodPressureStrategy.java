@@ -13,10 +13,10 @@ public class BloodPressureStrategy implements AlertStrategy {
         List<PatientRecord> systolicBloodPressureRecords = records.stream()
                 .filter(record -> "Systolic Blood Pressure".equals(record.getRecordType()))
                 .collect(Collectors.toList());
-
         List<PatientRecord> diastolicBloodPressureRecords = records.stream()
                 .filter(record -> "Diastolic Blood Pressure".equals(record.getRecordType()))
                 .collect(Collectors.toList());
+
 
         // Trend Alert systolic blood pressure
         if (systolicBloodPressureRecords.size() > 2) {

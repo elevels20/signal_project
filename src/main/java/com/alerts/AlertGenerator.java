@@ -33,6 +33,7 @@ public class AlertGenerator {
     public AlertGenerator(DataStorage dataStorage) {
         this.dataStorage = dataStorage;
         this.alertHandlers = new ArrayList<>();
+        this.alertStrategies = new ArrayList<>();
         // Add default alert handlers
         this.alertHandlers.add(new FileAlertHandler("alerts.log"));
         this.alertHandlers.add(new PagerAlertHandler(new Pager()));
@@ -59,7 +60,6 @@ public class AlertGenerator {
      */
     public void evaluateData(Patient patient) {
         List<PatientRecord> patientRecords = dataStorage.getRecords(patient.getPatientId(), Long.MIN_VALUE, Long.MAX_VALUE);
-
         // Check for each type of alert condition using strategies
         for (AlertStrategy strategy : alertStrategies) {
             strategy.checkAlert(patientRecords, this);
