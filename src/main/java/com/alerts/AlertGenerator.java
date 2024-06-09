@@ -62,16 +62,16 @@ public class AlertGenerator {
         for (int i = 0; i < patientRecords.size(); i++) {
             PatientRecord record = patientRecords.get(i);
             String type = record.getRecordType();
-            if (type == "Systolic Blood Pressure") {
+            if (type.equals("Systolic Blood Pressure")) {
                 systolicBloodPressureRecords.add(record);
             }
-            else if (type == "Diastolic Blood Pressure") {
+            else if (type.equals("Diastolic Blood Pressure")) {
                 diastolicBloodPressureRecords.add(record);
             }
-            else if (type == "Blood Saturation") {
+            else if (type.equals("Blood Saturation")) {
                 bloodSaturationRecords.add(record);
             }
-            else if (type == "ECG") {
+            else if (type.equals("ECG")) {
                 ECGRecords.add(record);
             }
             else { // Triggered Alert (by nurses or patients)
