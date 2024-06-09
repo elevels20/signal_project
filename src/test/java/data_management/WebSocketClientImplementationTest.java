@@ -16,6 +16,8 @@ import com.data_management.WebSocketClientImplementation;
 import com.cardio_generator.outputs.WebSocketOutputStrategy;
 import com.data_management.DataStorage;
 
+//Note: testOnOpen() might fail due to connection errors. If that is the case, re-run the test
+
 class WebSocketClientImplementationTest {
 
     private DataStorage dataStorage;
